@@ -12,9 +12,6 @@ Planner::Planner() {
   // ___________________
   // COLLISION DETECTION
   //    CollisionDetection configurationSpace;
-  // _________________
-  // TOPICS TO PUBLISH
-  pubStart = n.advertise<geometry_msgs::PoseStamped>("/move_base_simple/start", 1);
 
   // ___________________
   // TOPICS TO SUBSCRIBE
@@ -98,15 +95,10 @@ void Planner::setMap(const nav_msgs::OccupancyGrid::Ptr map) {
 //                                   INITIALIZE START
 //###################################################
 void Planner::setStart(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& initial) {
+  // TODO： x,y笛卡尔转栅格, 但是这里cellSize =1 相当于没转， t 还是rad
   float x = initial->pose.pose.position.x / Constants::cellSize;
   float y = initial->pose.pose.position.y / Constants::cellSize;
   float t = tf::getYaw(initial->pose.pose.orientation);
-  // publish the start without covariance for rviz
-  geometry_msgs::PoseStamped startN;
-  startN.pose.position = initial->pose.pose.position;
-  startN.pose.orientation = initial->pose.pose.orientation;
-  startN.header.frame_id = "map";
-  startN.header.stamp = ros::Time::now();
 
   std::cout << "I am seeing a new start x:" << x << " y:" << y << " t:" << Helper::toDeg(t) << std::endl;
 
@@ -116,8 +108,6 @@ void Planner::setStart(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr&
 
     if (Constants::manual) { plan();}
 
-    // publish start for RViz
-    pubStart.publish(startN);
   } else {
     std::cout << "invalid start x:" << x << " y:" << y << " t:" << Helper::toDeg(t) << std::endl;
   }
@@ -152,7 +142,6 @@ void Planner::plan() {
   // if a start as well as goal are defined go ahead and plan
   if (validStart && validGoal) {
 
-    // ___________________________
     // LISTS ALLOWCATED ROW MAJOR ORDER
     int width = grid->info.width;
     int height = grid->info.height;
@@ -162,20 +151,19 @@ void Planner::plan() {
     Node3D* nodes3D = new Node3D[length]();
     Node2D* nodes2D = new Node2D[width * height]();
 
-    // ________________________
     // retrieving goal position
+    // 这得要求起点 是【0，0，0】
     float x = goal.pose.position.x / Constants::cellSize;
     float y = goal.pose.position.y / Constants::cellSize;
     float t = tf::getYaw(goal.pose.orientation);
     // set theta to a value (0,2PI]
     t = Helper::normalizeHeadingRad(t);
     const Node3D nGoal(x, y, t, 0, 0, nullptr);
-    // __________
+
     // DEBUG GOAL
     //    const Node3D nGoal(155.349, 36.1969, 0.7615936, 0, 0, nullptr);
 
 
-    // _________________________
     // retrieving start position
     x = start.pose.pose.position.x / Constants::cellSize;
     y = start.pose.pose.position.y / Constants::cellSize;
@@ -183,12 +171,7 @@ void Planner::plan() {
     // set theta to a value (0,2PI]
     t = Helper::normalizeHeadingRad(t);
     Node3D nStart(x, y, t, 0, 0, nullptr);
-    // ___________
-    // DEBUG START
-    //    Node3D nStart(108.291, 30.1081, 0, 0, 0, nullptr);
 
-
-    // ___________________________
     // START AND TIME THE PLANNING
     ros::Time t0 = ros::Time::now();
 

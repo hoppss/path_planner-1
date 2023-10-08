@@ -5,7 +5,8 @@
 
 #include "constants.h"
 namespace HybridAStar {
-
+// cost-so-far  g
+// cost-to-go   h
 /*!
    \brief A two dimensional node class used for the holonomic with obstacles heuristic.
 
@@ -109,6 +110,7 @@ class Node2D {
   /// the cost-to-go
   float h;
   /// the index of the node in the 2D array
+  // idx = y * width + x
   int idx;
   /// the open value
   bool o;

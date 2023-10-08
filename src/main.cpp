@@ -43,7 +43,7 @@ void message(const T& msg, T1 val = T1()) {
    \return 0
 */
 int main(int argc, char** argv) {
-
+  // log
   message<string, int>("Hybrid A* Search\nA pathfinding algorithm on grids, by Karl Kurzer");
 
   message("cell size: ", HybridAStar::Constants::cellSize);

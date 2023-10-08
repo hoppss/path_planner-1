@@ -65,7 +65,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
   nodes3D[iPred] = start;
 
   // NODE POINTER
-  Node3D* nPred;
+  Node3D* nPred;  // pred 就是当前expansion node
   Node3D* nSucc;
 
   // float max = 0.f;
@@ -129,6 +129,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
     iterations++;
 
     // RViz visualization
+    // 可视化当前扩展 或者 历史节点
     if (Constants::visualization) {
       visualization.publishNode3DPoses(*nPred);
       visualization.publishNode3DPose(*nPred);
@@ -151,18 +152,16 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
       // remove node from open list
       O.pop();
 
-      // _________
       // GOAL TEST
       if (*nPred == goal || iterations > Constants::iterations) {
         // DEBUG
         return nPred;
       }
-
-      // ____________________
       // CONTINUE WITH SEARCH
       else {
-        // _______________________
         // SEARCH WITH DUBINS SHOT
+        // 解析解抽奖， 这里限制距离， 朝向，以及前进方向
+        // TODO: 或者可以将终点投影到新生成的边上， 根据距离朝向阈值判断
         if (Constants::dubinsShot && nPred->isInRange(goal) && nPred->getPrim() < 3) {
           nSucc = dubinsShot(*nPred, goal, configurationSpace);
 
@@ -173,7 +172,6 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
           }
         }
 
-        // ______________________________
         // SEARCH WITH FORWARD SIMULATION
         for (int i = 0; i < dir; i++) {
           // create possible successor
@@ -188,6 +186,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
             if (!nodes3D[iSucc].isClosed() || iPred == iSucc) {
 
               // calculate new G value
+              // TODO: 计算G， 重要
               nSucc->updateG();
               newG = nSucc->getG();
 
@@ -195,6 +194,7 @@ Node3D* Algorithm::hybridAStar(Node3D& start,
               if (!nodes3D[iSucc].isOpen() || newG < nodes3D[iSucc].getG() || iPred == iSucc) {
 
                 // calculate H value
+                // TODO: 计算H, 重要
                 updateH(*nSucc, goal, nodes2D, dubinsLookup, width, height, configurationSpace, visualization);
 
                 // if the successor is in the same cell but the C value is larger
@@ -260,7 +260,7 @@ float aStar(Node2D& start,
   start.updateH(goal);
   // mark start as open
   start.open();
-  // push on priority queue
+  // push on priority queue  优先级队列里面的是指针
   O.push(&start);
   iPred = start.setIdx(width);
   nodes2D[iPred] = start;
@@ -342,6 +342,7 @@ float aStar(Node2D& start,
   }
 
   // return large number to guide search away
+  // TODO save max g value when expansion
   return 1000;
 }
 
@@ -424,6 +425,7 @@ void updateH(Node3D& start, const Node3D& goal, Node2D* nodes2D, float* dubinsLo
     rsStart->setYaw(start.getT());
     rsEnd->setXY(goal.getX(), goal.getY());
     rsEnd->setYaw(goal.getT());
+    // TODO： 这里cost只有距离， 应该加上是否倒车， 运动方向是否改变， 进行系数相乘
     reedsSheppCost = reedsSheppPath.distance(rsStart, rsEnd);
     //    ros::Time t1 = ros::Time::now();
     //    ros::Duration d(t1 - t0);

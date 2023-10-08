@@ -3,6 +3,13 @@ using namespace HybridAStar;
 //###################################################
 //                                CLEAR VISUALIZATION
 //###################################################
+/*
+    // action
+    ADD = 0u,
+    MODIFY = 0u,
+    DELETE = 2u,
+    DELETEALL = 3u,
+*/
 void Visualize::clear() {
   poses3D.poses.clear();
   poses3Dreverse.poses.clear();
@@ -15,7 +22,7 @@ void Visualize::clear() {
   costCube3D.header.frame_id = "path";
   costCube3D.header.stamp = ros::Time::now();
   costCube3D.id = 0;
-  costCube3D.action = 3;
+  costCube3D.action = 3;  // delete all
   costCubes3D.markers.push_back(costCube3D);
   pubNodes3DCosts.publish(costCubes3D);
 
@@ -137,12 +144,13 @@ void Visualize::publishNode3DCosts(Node3D* nodes, int width, int height, int dep
 
   float values[width * height];
 
-  // ________________________________
   // DETERMINE THE MAX AND MIN VALUES
   for (int i = 0; i < width * height; ++i) {
+    //　给默认值，比如没有扩展过的
     values[i] = 1000;
 
     // iterate over all headings
+    // 索引方式有点费解
     for (int k = 0; k < depth; ++k) {
       idx = k * width * height + i;
 
@@ -163,7 +171,6 @@ void Visualize::publishNode3DCosts(Node3D* nodes, int width, int height, int dep
     }
   }
 
-  // _______________
   // PAINT THE CUBES
   for (int i = 0; i < width * height; ++i) {
     // if a value exists continue
@@ -172,10 +179,10 @@ void Visualize::publishNode3DCosts(Node3D* nodes, int width, int height, int dep
 
       // delete all previous markers
       if (once) {
-        costCube.action = 3;
+        costCube.action = 3;  // delete all
         once = false;
       } else {
-        costCube.action = 0;
+        costCube.action = 0;  // add
       }
 
 
@@ -188,6 +195,7 @@ void Visualize::publishNode3DCosts(Node3D* nodes, int width, int height, int dep
       costCube.scale.y = Constants::cellSize;
       costCube.scale.z = 0.1;
       costCube.color.a = 0.5;
+      // 通过颜色梯度来表征cost
       heatMapGradient.getColorAtValue(values[i], red, green, blue);
       costCube.color.r = red;
       costCube.color.g = green;
@@ -228,7 +236,6 @@ void Visualize::publishNode2DCosts(Node2D* nodes, int width, int height) {
 
   float values[width * height];
 
-  // ________________________________
   // DETERMINE THE MAX AND MIN VALUES
   for (int i = 0; i < width * height; ++i) {
     values[i] = 1000;
@@ -245,7 +252,6 @@ void Visualize::publishNode2DCosts(Node2D* nodes, int width, int height) {
     }
   }
 
-  // _______________
   // PAINT THE CUBES
   for (int i = 0; i < width * height; ++i) {
     // if a value exists continue
@@ -271,6 +277,7 @@ void Visualize::publishNode2DCosts(Node2D* nodes, int width, int height) {
       costCube.scale.z = 0.1;
       costCube.color.a = 0.5;
       heatMapGradient.getColorAtValue(values[i], red, green, blue);
+      // 通过颜色梯度来表征
       costCube.color.r = red;
       costCube.color.g = green;
       costCube.color.b = blue;

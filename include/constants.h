@@ -9,6 +9,7 @@
 ////###################################################
 ////                                               INFO
 ////###################################################
+//    0-360 角度区间， 0指向正北Y
 //    HEADING => 0 - 359 degrees, 0 being north pointing towards positive Y
 //    X-COORDINATE => designating the width of the grid
 //    Y-COORDINATE => designating the height of the grid
@@ -115,6 +116,7 @@ static const int dubinsArea = dubinsWidth * dubinsWidth;
 // COLLISION LOOKUP SPECIFIC
 
 /// [m] -- The bounding box size length and width to precompute all possible headings
+// TODO: 对角线长度+4 ???  单位应该是个数吧 多个少cell
 static const int bbSize = std::ceil((sqrt(width * width + length* length) + 4) / cellSize);
 /// [#] --- The sqrt of the number of discrete positions per cell
 static const int positionResolution = 10;
@@ -130,6 +132,7 @@ struct relPos {
 /// A structure capturing the lookup for each theta configuration
 struct config {
   /// the number of cells occupied by this configuration of the vehicle
+  // TODO: length ？？？
   int length;
   /*!
      \var relPos pos[64]
@@ -156,6 +159,7 @@ struct color {
   float blue;
 };
 /// A definition for a color used for visualization
+/// 蓝绿色， 三原色比重
 static constexpr color teal = {102.f / 255.f, 217.f / 255.f, 239.f / 255.f};
 /// A definition for a color used for visualization
 static constexpr color green = {166.f / 255.f, 226.f / 255.f, 46.f / 255.f};

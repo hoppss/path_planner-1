@@ -70,7 +70,7 @@ class CollisionDetection {
      \param y the y position
      \param t the theta angle
      \return the cost of the configuration q of W(q)
-     \todo needs to be implemented correctly
+     \todo needs to be implemented correctly 没用
   */
   float configurationCost(float x, float y, float t) const {return 0;}
 
@@ -80,6 +80,7 @@ class CollisionDetection {
      \param y the y position
      \param t the theta angle
      \return true if it is in C_free, else false
+     生效函数
   */
   bool configurationTest(float x, float y, float t) const;
 
@@ -92,6 +93,7 @@ class CollisionDetection {
   /// The occupancy grid
   nav_msgs::OccupancyGrid::Ptr grid;
   /// The collision lookup table
+  // heading: 72 * positions: 100
   Constants::config collisionLookup[Constants::headings * Constants::positions];
 };
 }

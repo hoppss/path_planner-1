@@ -5,8 +5,9 @@ using namespace HybridAStar;
 // possible directions
 const int Node2D::dir = 8;
 // possible movements
-const int Node2D::dx[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-const int Node2D::dy[] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+//                        左中 左上 中上 右上 右中 右下 中下 左下
+const int Node2D::dx[] = { -1, -1, 0, 1, 1,  1,  0, -1 };
+const int Node2D::dy[] = { 0,  1,  1, 1, 0, -1, -1, -1 };
 
 //###################################################
 //                                         IS ON GRID

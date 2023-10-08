@@ -35,12 +35,14 @@ int main(int argc, char** argv) {
     }
 
     // odom to map
+    // 地图origin 都是0度角, 差一个平移
     broadcaster.sendTransform(
       tf::StampedTransform(
         tf::Transform(tf::Quaternion(0, 0, 0, 1), tfPose.getOrigin()),
         ros::Time::now(), "odom", "map"));
 
     // map to path
+    // map == path
     broadcaster.sendTransform(
       tf::StampedTransform(
         tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0, 0, 0)),

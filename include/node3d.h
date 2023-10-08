@@ -65,7 +65,7 @@ class Node3D {
   void setG(const float& g) { this->g = g; }
   /// set the cost-to-come (heuristic value)
   void setH(const float& h) { this->h = h; }
-  /// set and get the index of the node in the 3D grid
+  /// set and get the index of the node in the 3D grid， 索引计算方法  比如第三维 要乘以前两维；  第二维要乘以第一维
   int setIdx(int width, int height) { this->idx = (int)(t / Constants::deltaHeadingRad) * width * height + (int)(y) * width + (int)(x); return idx;}
   /// open the node
   void open() { o = true; c = false;}
@@ -106,6 +106,7 @@ class Node3D {
 
  private:
   /// the x position
+  /// 笛卡尔坐标，而不是栅格索引
   float x;
   /// the y position
   float y;

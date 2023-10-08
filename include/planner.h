@@ -65,8 +65,7 @@ class Planner {
  private:
   /// The node handle
   ros::NodeHandle n;
-  /// A publisher publishing the start position for RViz
-  ros::Publisher pubStart;
+
   /// A subscriber for receiving map updates
   ros::Subscriber subMap;
   /// A subscriber for receiving goal updates

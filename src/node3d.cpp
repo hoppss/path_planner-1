@@ -11,6 +11,9 @@ const int Node3D::dir = 3;
 //const float Node3D::dt[] = { 0,         0.10472,   -0.10472};
 
 // R = 6, 6.75 DEG
+// 0 直行
+// 1 右打, dy为负，所以右打，TODO: 但是dt角度怎么是反的 ???
+// 2 左打
 const float Node3D::dy[] = { 0,        -0.0415893,  0.0415893};
 const float Node3D::dx[] = { 0.7068582,   0.705224,   0.705224};
 const float Node3D::dt[] = { 0,         0.1178097,   -0.1178097};
@@ -39,6 +42,7 @@ bool Node3D::isInRange(const Node3D& goal) const {
   int random = rand() % 10 + 1;
   float dx = std::abs(x - goal.x) / random;
   float dy = std::abs(y - goal.y) / random;
+  // 100m, 10m 以内抽奖
   return (dx * dx) + (dy * dy) < Constants::dubinsShotDistance;
 }
 
@@ -51,13 +55,16 @@ Node3D* Node3D::createSuccessor(const int i) {
   float tSucc;
 
   // calculate successor positions forward
+  // 0 1 2
   if (i < 3) {
     xSucc = x + dx[i] * cos(t) - dy[i] * sin(t);
     ySucc = y + dx[i] * sin(t) + dy[i] * cos(t);
     tSucc = Helper::normalizeHeadingRad(t + dt[i]);
   }
   // backwards
+  // 3 4 5
   else {
+    // 后退时只是dx 取反， 说明x 是车头方向
     xSucc = x - dx[i - 3] * cos(t) - dy[i - 3] * sin(t);
     ySucc = y - dx[i - 3] * sin(t) + dy[i - 3] * cos(t);
     tSucc = Helper::normalizeHeadingRad(t - dt[i - 3]);
@@ -79,9 +86,12 @@ void Node3D::updateG() {
       if (pred->prim > 2) {
         g += dx[0] * Constants::penaltyTurning * Constants::penaltyCOD;
       } else {
+        // 同向，但是转角改变
+        // TODO: 没有根据转角变化大小惩罚
         g += dx[0] * Constants::penaltyTurning;
       }
     } else {
+      // 保持 前后一致的steering， 继续前进
       g += dx[0];
     }
   }
@@ -93,9 +103,11 @@ void Node3D::updateG() {
       if (pred->prim < 3) {
         g += dx[0] * Constants::penaltyTurning * Constants::penaltyReversing * Constants::penaltyCOD;
       } else {
+        // 同向，但是转角改变
         g += dx[0] * Constants::penaltyTurning * Constants::penaltyReversing;
       }
     } else {
+      // 保持 前后一致的steering, 继续后退
       g += dx[0] * Constants::penaltyReversing;
     }
   }
